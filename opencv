@@ -1,0 +1,50 @@
+ {
+   "cell_type": "code",
+   "execution_count": 8,
+   "metadata": {
+    "collapsed": false
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "(448, 663, 3)\n"
+     ]
+    }
+   ],
+   "source": [
+
+"def image_histogram_equalization(image):\n",
+    "    hist, bins = np.histogram(image.flatten(), 256,[0,256])\n",
+    "\n",
+    "    cdf = hist.cumsum()\n",
+    "\n",
+    "    # cdf의 값이 0인 경우는 mask처리를 하여 계산에서 제외\n",
+    "    # mask처리가 되면 Numpy 계산에서 제외가 됨\n",
+    "    # 아래는 cdf array에서 값이 0인 부분을 mask처리함\n",
+    "    cdf_m = np.ma.masked_equal(cdf,0)\n",
+    "    \n",
+    "    #History Equalization 공식\n",
+    "    cdf_m = (cdf_m - cdf_m.min())*255/(cdf_m.max()-cdf_m.min())\n",
+    "    \n",
+    "    # Mask처리를 했던 부분을 다시 0으로 변환\n",
+    "    cdf = np.ma.filled(cdf_m,0).astype('uint8')\n",
+    "    return cdf[image]\n",
+    "\n",
+    "#img = cv2.imread(\"chapter3/planet_glow.jpg\")\n",
+    "cv2.imshow(\"org\", img)\n",
+    "\n",
+    "hist_b = image_histogram_equalization(img[:,:,0])\n",
+    "hist_g = image_histogram_equalization(img[:,:,1])\n",
+    "hist_r = image_histogram_equalization(img[:,:,2])\n",
+    "\n",
+    "#cv2.imshow(\"histogram_equalization_b\",hist_b)\n",
+    "#cv2.imshow(\"histogram_equalization_g\",hist_g)\n",
+    "#cv2.imshow(\"histogram_equalization_r\",hist_r)\n",
+    "\n",
+    "rgbArray = np.dstack((hist_b,hist_g,hist_r))\n",
+    "cv2.imshow(\"rgbArray\",rgbArray)\n",
+    "\n",
+    "cv2.waitKey()\n",
+    "cv2.destroyAllWindows()\n"
